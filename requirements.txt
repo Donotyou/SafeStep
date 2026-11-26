@@ -1,0 +1,7 @@
+flask
+Pillow
+requests
+networkx
+# optional: for better routing install osmnx
+# osmnx
+

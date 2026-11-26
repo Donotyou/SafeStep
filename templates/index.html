@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-5 fw-bold">Welcome to SafeStep</h1>
+                <p class="lead text-muted">Find safe walking routes and report obstacles easily.</p>
+                <div class="d-flex gap-2 mt-4">
+                    <a href="/routes" class="btn btn-primary btn-lg shadow-sm">Plan Your Route</a>
+                    <a href="/report" class="btn btn-outline-secondary btn-lg">Report a Problem</a>
+                </div>
+                <p class="text-muted small mt-3">Community-driven safety data, live updates, and accessible routing.</p>
+            </div>
+            <div class="col-lg-5 mt-4 mt-lg-0">
+                <div class="card shadow-sm rounded">
+                    <div class="card-body p-2">
+                        <div id="preview-map" class="rounded" style="height:260px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="h4 mb-4">How it works</h2>
+        <div class="row g-3 row-cols-1 row-cols-md-3">
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded p-3">
+                    <div class="fs-2 mb-2">
+                        <span class="badge bg-primary"><i class="bi bi-map-fill" aria-hidden="true"></i></span>
+                    </div>
+                    <h5 class="mb-1">Plan a route</h5>
+                    <p class="text-muted small mb-0">Get walking directions that prioritise safe sidewalks and crossings.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded p-3">
+                    <div class="fs-2 mb-2">
+                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></span>
+                    </div>
+                    <h5 class="mb-1">Report an issue</h5>
+                    <p class="text-muted small mb-0">Quickly submit obstacles or hazards with location and a short note.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded p-3">
+                    <div class="fs-2 mb-2">
+                        <span class="badge bg-success"><i class="bi bi-people-fill" aria-hidden="true"></i></span>
+                    </div>
+                    <h5 class="mb-1">Community updates</h5>
+                    <p class="text-muted small mb-0">View verified reports and stay informed about route safety.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <h2 class="h4 mb-4">Features</h2>
+        <div class="row g-3 row-cols-1 row-cols-md-3">
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded p-3">
+                    <h5 class="mb-1">Safe routes</h5>
+                    <p class="text-muted small mb-0">Routing that avoids risky crossings and inaccessible sidewalks.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded p-3">
+                    <h5 class="mb-1">Community reports</h5>
+                    <p class="text-muted small mb-0">Crowd-sourced problem reports help others avoid hazards.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm rounded p-3">
+                    <h5 class="mb-1">Real-time updates</h5>
+                    <p class="text-muted small mb-0">See recent reports and plan with fresh information.</p>
+                </div>
+            </div>
+        </div>
+                <!-- Status legend -->
+                <div class="mt-3">
+                    <span class="badge bg-success me-2"><i class="bi bi-check-circle-fill"></i> Safe</span>
+                    <span class="badge bg-warning text-dark me-2"><i class="bi bi-exclamation-triangle-fill"></i> Moderate</span>
+                    <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Unsafe</span>
+                </div>
+    </div>
+</section>
+
+<!-- Footer small links -->
+<footer class="py-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <small class="text-muted">© {{ now().year if now is defined else '' }} SafeStep</small>
+        <div>
+            <a href="/about" class="text-muted me-3 small">About</a>
+            <a href="/contact" class="text-muted me-3 small">Contact</a>
+            <a href="/terms" class="text-muted small">Terms</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Leaflet (lightweight preview only) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Expose problems for other scripts if present -->
+<script>
+        var problems = {{ problems | tojson }};
+</script>
+
+<!-- Inline preview map script (minimal, demo markers) -->
+<script>
+    (function(){
+        // Preview coordinates (example city centre)
+        var center = [37.7749, -122.4194];
+        var map = L.map('preview-map', { scrollWheelZoom:false, attributionControl:false }).setView(center, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        // Safe marker (green)
+        L.circleMarker([37.77986, -122.41479], { radius:8, color:'#2ecc71', fillColor:'#2ecc71', fillOpacity:0.9 })
+            .bindPopup('<strong>Safe route</strong><br/>Clear sidewalk').addTo(map);
+
+        // Unsafe marker (red)
+        L.circleMarker([37.77071, -122.43007], { radius:8, color:'#e74c3c', fillColor:'#e74c3c', fillOpacity:0.9 })
+            .bindPopup('<strong>Reported issue</strong><br/>Blocked crossing').addTo(map);
+
+        // Disable interactions on the preview for simplicity on small devices
+        map.touchZoom.disable(); map.doubleClickZoom.disable(); map.boxZoom.disable(); map.keyboard.disable();
+    })();
+</script>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row g-3">
+  <div class="col-12 col-lg-4 p-3 sidebar">
+    <div class="card shadow-sm rounded">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Admin Dashboard</h5>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Region</label>
+          <select id="region-select" class="form-select">
+            <option value="all">All Areas</option>
+            <option value="cairo_center">Cairo Center</option>
+            <option value="downtown">Downtown</option>
+            <option value="giza">Giza</option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <h6 class="fw-semibold">Reported Problems</h6>
+          <div class="table-responsive shadow-sm rounded mt-2">
+            <table id="problems-table" class="table table-hover table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="align-middle">Type</th>
+                  <th class="align-middle">Location</th>
+                  <th class="align-middle">Status</th>
+                  <th class="align-middle">Reported At</th>
+                  <th class="align-middle text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-8 p-3">
+    <div class="card shadow-sm rounded h-100">
+      <div class="card-body p-0">
+        <div id="admin-map" class="map-full rounded"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script>
+  window.ADMIN_PROBLEMS_API = '/api/admin/problems';
+  window.ADMIN_RESOLVE_API = '/api/admin/resolve';
+</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+{% endblock %}

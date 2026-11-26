@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="card shadow-sm rounded mb-3">
+            <div class="card-body">
+                <h4 class="card-title">Report a Problem</h4>
+                <p class="text-muted small">Click the map to select the exact location. Optionally search by place name.</p>
+
+                <div class="input-group mb-3">
+                    <input id="search-input" type="text" class="form-control" placeholder="Search place name (optional)">
+                    <button id="search-btn" type="button" class="btn btn-outline-secondary">Search</button>
+                    <button id="clear-btn" type="button" class="btn btn-outline-secondary">Clear</button>
+                </div>
+
+                <div id="report-map" class="rounded" style="height:460px; border:1px solid #e9ecef;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card shadow-sm rounded mb-3">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" class="d-grid gap-2">
+                    <!-- Hidden lat/lon fields — backend expects `lat` and `lon` -->
+                    <input type="hidden" name="lat" id="lat-field" value="">
+                    <input type="hidden" name="lon" id="lon-field" value="">
+
+                    <label class="form-label fw-bold">Upload Image</label>
+                    <input type="file" name="image" class="form-control" required>
+
+                    <div class="form-text mt-2">When ready, submit the image and selected location.</div>
+                    <button type="submit" class="btn btn-primary mt-2">Submit Report</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Initialize map centered on Cairo (or a fallback)
+    var map = L.map('report-map').setView([30.0444, 31.2357], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var marker = null;
+
+    function setMarker(lat, lon){
+        if(marker){
+            marker.setLatLng([lat, lon]);
+        } else {
+            marker = L.marker([lat, lon], {draggable:true}).addTo(map);
+            // update coords when marker dragged
+            marker.on('dragend', function(e){
+                var p = marker.getLatLng();
+                updateFields(p.lat, p.lng);
+            });
+        }
+        updateFields(lat, lon);
+    }
+
+    function updateFields(lat, lon){
+        document.getElementById('lat-field').value = lat;
+        document.getElementById('lon-field').value = lon;
+    }
+
+    // Place marker on map click
+    map.on('click', function(e){
+        setMarker(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Optional simple Nominatim search
+    document.getElementById('search-btn').addEventListener('click', function(){
+        var q = document.getElementById('search-input').value.trim();
+        if(!q) return;
+        var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q);
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function(resp){ return resp.json(); })
+            .then(function(results){
+                if(results && results.length>0){
+                    var r = results[0];
+                    var lat = parseFloat(r.lat);
+                    var lon = parseFloat(r.lon);
+                    map.setView([lat, lon], 16);
+                    // place marker so user can fine-tune by clicking or dragging
+                    setMarker(lat, lon);
+                } else {
+                    alert('Place not found');
+                }
+            })
+            .catch(function(err){
+                console.error(err);
+                alert('Search failed');
+            });
+    });
+
+    document.getElementById('clear-btn').addEventListener('click', function(){
+        if(marker){ map.removeLayer(marker); marker = null; }
+        updateFields('', '');
+        document.getElementById('search-input').value = '';
+    });
+
+    // If you want to pre-fill a default coordinate (optional), uncomment:
+    // setMarker(30.0610, 31.2430);
+</script>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row g-3">
+    <div class="col-12 col-lg-4 p-3">
+        <div class="card shadow-sm rounded">
+            <div class="card-body">
+                <h5 class="card-title">Route Planner</h5>
+                <div class="mb-3">
+                    <input id="search-start" class="form-control mb-2" type="text" placeholder="Start place or click map">
+                    <input id="search-dest" class="form-control mb-2" type="text" placeholder="Destination place or click map">
+                    <div class="d-flex gap-2">
+                        <button id="plan-btn" class="btn btn-primary btn-sm">Plan Routes</button>
+                        <button id="clear-btn" class="btn btn-secondary btn-sm">Clear</button>
+                        <button id="report-btn" class="btn btn-outline-danger btn-sm ms-auto">Report</button>
+                    </div>
+                </div>
+
+                <hr>
+                <div>
+                    <h6 class="fw-semibold">Routes</h6>
+                    <div id="routes-list" class="mt-2"></div>
+                </div>
+
+                <hr>
+                <div>
+                    <h6 class="fw-semibold">Legend</h6>
+                    <div class="mt-2"><span class="badge" style="background:green;">&nbsp;&nbsp;</span> <span class="ms-2">Safe</span></div>
+                    <div class="mt-1"><span class="badge" style="background:gold;">&nbsp;&nbsp;</span> <span class="ms-2">Moderate</span></div>
+                    <div class="mt-1"><span class="badge" style="background:red;">&nbsp;&nbsp;</span> <span class="ms-2">Unsafe</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-8 p-3">
+        <div class="card shadow-sm rounded h-100">
+            <div class="card-body p-0">
+                <div id="routes-map" class="map-full rounded"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- report modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="report-form" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">Report Problem</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="lat" id="modal-lat">
+                    <input type="hidden" name="lon" id="modal-lon">
+
+                    <div class="mb-3">
+                        <label for="modal-image" class="form-label fw-bold">Photo</label>
+                        <input id="modal-image" name="image" type="file" class="form-control" accept="image/*">
+                    </div>
+
+                    <div class="alert alert-info small mb-0">Click the map to choose location; coordinates captured automatically.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<script>
+        window.ROUTES_API = '/api/compute_routes';
+        window.PROBLEMS_API = '/api/problems';
+        window.REPORT_API = '/api/report';
+</script>
+
+<script src="{{ url_for('static', filename='js/routes_map.js') }}"></script>
+
+{% endblock %}

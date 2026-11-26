@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-db = r"D:\SavaStep-main\data\safepath.db"
+db = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "safepath.db")
 conn = sqlite3.connect(db)
 c = conn.cursor()
 

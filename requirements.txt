@@ -2,6 +2,8 @@ flask
 Pillow
 requests
 networkx
-# optional: for better routing install osmnx
-# osmnx
-
+ultralytics
+transformers
+torch
+# optional: real street-network routing (otherwise the app falls back to straight-line routes)
+osmnx
